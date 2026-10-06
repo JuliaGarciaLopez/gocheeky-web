@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Go Cheeky — International Branding Studio for Creators</title>
+  
+  <!-- Google Fonts: Poppins (Lectura) y Yuyu (Acentos / Identidad) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Yuyu:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* 1. Declaración de la fuente Barnebok (Display) */
+    @font-face {
+      font-family: 'Barnebok';
+      src: url('fonts/Barnebok.woff2') format('woff2'),
+           url('fonts/Barnebok.woff') format('woff'),
+           url('fonts/Barnebok.otf') format('opentype');
+      font-weight: 900;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    /* 2. Variables del sistema y paleta Go Cheeky */
+    :root {
+      --color-pink: #FF3388;       /* Fucsia neón insignia */
+      --color-black: #1A1F1D;      /* Negro carbón / Grafito */
+      --color-cream: #F8F7EE;      /* Vainilla suave / Fondo neutro */
+      --color-blue: #70BAFF;       /* Azul cielo acento */
+      --color-lime: #D6E842;       /* Lima eléctrico */
+      --color-card-bg: #FFFFFF;    /* Blanco para tarjetas */
+      
+      --font-display: 'Barnebok', sans-serif;
+      --font-accent: 'Yuyu', sans-serif;
+      --font-body: 'Poppins', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--color-cream);
+      color: var(--color-black);
+      font-family: var(--font-body);
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    /* --- CONTENEDOR GLOBAL PARA VISIÓN EDITORIAL ("DESDE MÁS LEJOS") --- */
+    .site-wrapper {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+
+    /* --- TAMAÑO DE LOS LOGOS Y RECORTE --- */
+    .nav-logo-img {
+      height: clamp(340px, 36vw, 460px);
+      width: auto;
+      max-width: none;
+      display: block;
+      margin: 0;
+      /* Ajuste de escala calibrado para que impacte sin salirse del marco */
+      transform: translateY(-16%) scale(3);
+    }
+
+    .footer-logo-img {
+      height: 42px;
+      width: auto;
+      display: block;
+    }
+
+    /* --- HEADER --- */
+    header {
+      width: 100%;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: static;
+      background: var(--color-lime);
+      border-bottom: 2px solid var(--color-black);
+    }
+
+    /* --- CAJA DEL LOGO CON MULTIPLICADOR DE ESCALA CALIBRADO --- */
+    .brand-logo {
+      --box-scale: 1.45; /* Proporción equilibrada */
+
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+
+      height: clamp(
+        calc(160px * var(--box-scale)),
+        calc(18vw * var(--box-scale)),
+        calc(220px * var(--box-scale))
+      );
+
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      text-decoration: none;
+    }
+
+    /* --- BOTÓN FLOTANTE INDEPENDIENTE --- */
+    .nav-cta {
+      position: fixed;
+      top: 22px;
+      right: 32px;
+      z-index: 999;
+      background: var(--color-black);
+      color: var(--color-cream);
+      font-family: var(--font-body);
+      font-weight: 800;
+      font-size: 0.9rem;
+      padding: 11px 22px;
+      border-radius: 999px;
+      text-decoration: none;
+      border: 2px solid var(--color-black);
+      box-shadow: 3px 3px 0px var(--color-black);
+      transition: all 0.2s ease;
+    }
+
+    .nav-cta:hover {
+      background: var(--color-pink);
+      color: var(--color-black);
+      transform: translate(-2px, -2px);
+      box-shadow: 5px 5px 0px var(--color-black);
+    }
+
+    /* --- HERO SECTION --- */
+    .hero {
+      padding: 60px 50px 70px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .location-tags {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .tag {
+      font-family: var(--font-accent);
+      background: var(--color-lime);
+      color: var(--color-black);
+      font-size: 1.6rem;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 22px 8px 22px;
+      border-radius: 999px;
+      border: 2px solid var(--color-black);
+      text-transform: capitalize;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.4rem, 5vw, 4.4rem);
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      max-width: 17ch;
+      margin-bottom: 24px;
+    }
+
+    .hero-title .highlight {
+      color: var(--color-pink);
+      text-decoration: underline wavy var(--color-blue) 3px;
+      text-underline-offset: 6px;
+    }
+
+    .hero-sub {
+      font-size: 1.15rem;
+      max-width: 580px;
+      color: #333;
+      margin-bottom: 32px;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    .btn-main {
+      font-family: var(--font-body);
+      background: var(--color-pink);
+      color: var(--color-black);
+      font-size: 1rem;
+      font-weight: 800;
+      padding: 14px 30px;
+      border-radius: 999px;
+      border: 2px solid var(--color-black);
+      box-shadow: 4px 4px 0px var(--color-black);
+      text-decoration: none;
+      display: inline-block;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-main:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0px var(--color-black);
+      background: var(--color-lime);
+    }
+
+    /* --- TICKER / MARQUEE --- */
+    .ticker {
+      background: var(--color-black);
+      color: var(--color-cream);
+      padding: 12px 0;
+      overflow: hidden;
+      white-space: nowrap;
+      display: flex;
+      border-top: 2px solid var(--color-black);
+      border-bottom: 2px solid var(--color-black);
+    }
+
+    .ticker-inner {
+      display: flex;
+      gap: 36px;
+      animation: scroll 22s linear infinite;
+      font-family: var(--font-accent);
+      font-size: 1.6rem;
+      text-transform: lowercase;
+    }
+
+    @keyframes scroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* --- PROCESO EN 3 PASOS --- */
+    .process {
+      padding: 70px 0;
+      background: #FFFFFF;
+      border-bottom: 2px solid var(--color-black);
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 2.1rem;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      margin-bottom: 36px;
+    }
+
+    .process-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 22px;
+    }
+
+    .process-card {
+      background: var(--color-cream);
+      border: 2px solid var(--color-black);
+      padding: 28px 22px;
+      border-radius: 14px;
+      box-shadow: 4px 4px 0px var(--color-black);
+    }
+
+    .process-num {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      color: var(--color-pink);
+      margin-bottom: 10px;
+    }
+
+    .process-card h3 {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      margin-bottom: 10px;
+    }
+
+    .process-card p {
+      font-size: 0.92rem;
+      color: #444;
+      line-height: 1.5;
+    }
+
+    /* --- WORK SHOWCASE --- */
+    .showcase {
+      padding: 70px 0;
+    }
+
+    .work-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .work-card {
+      background: var(--color-card-bg);
+      border: 2px solid var(--color-black);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 4px 4px 0px var(--color-black);
+    }
+
+    .work-box {
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 2px solid var(--color-black);
+      font-family: var(--font-display);
+      font-size: 2rem;
+      letter-spacing: -0.02em;
+    }
+
+    .bg-pink { background: var(--color-pink); color: var(--color-black); }
+    .bg-blue { background: var(--color-blue); color: var(--color-black); }
+    .bg-lime { background: var(--color-lime); color: var(--color-black); }
+
+    .work-details {
+      padding: 18px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .work-details h4 {
+      font-family: var(--font-body);
+      font-weight: 800;
+      font-size: 1.3rem;
+    }
+
+    .work-details span {
+      font-family: var(--font-accent);
+      font-size: 1.3rem;
+      color: #666;
+      text-transform: lowercase;
+    }
+
+    /* --- QUALIFICATION FORM + CALENDAR --- */
+    .funnel-section {
+      padding: 80px 0;
+      background: var(--color-cream);
+      border-top: 2px solid var(--color-black);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .funnel-container {
+      width: 100%;
+      max-width: 620px;
+      background: #FFFFFF;
+      border: 2px solid var(--color-black);
+      border-radius: 18px;
+      padding: 36px;
+      box-shadow: 6px 6px 0px var(--color-black);
+    }
+
+    .funnel-header {
+      margin-bottom: 26px;
+      text-align: center;
+    }
+
+    .funnel-header h2 {
+      font-family: var(--font-display);
+      font-size: 2.1rem;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .funnel-header p {
+      font-size: 0.95rem;
+      color: #555;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid var(--color-black);
+      border-radius: 10px;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      background: var(--color-cream);
+      outline: none;
+    }
+
+    .form-control:focus {
+      background: #FFF;
+      box-shadow: 0 0 0 3px var(--color-pink);
+    }
+
+    select.form-control {
+      cursor: pointer;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--color-black);
+      color: var(--color-cream);
+      font-family: var(--font-body);
+      font-size: 1.05rem;
+      font-weight: 800;
+      padding: 15px;
+      border-radius: 999px;
+      border: 2px solid var(--color-black);
+      box-shadow: 4px 4px 0px var(--color-black);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 10px;
+      display: inline-block;
+    }
+
+    .btn-submit:hover {
+      background: var(--color-pink);
+      color: var(--color-black);
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0px var(--color-black);
+    }
+
+    #calendar-wrapper {
+      display: none;
+      margin-top: 28px;
+      border-top: 2px dashed var(--color-black);
+      padding-top: 28px;
+      text-align: center;
+    }
+
+    .calendar-embed {
+      width: 100%;
+      height: 440px;
+      background: var(--color-cream);
+      border: 2px solid var(--color-black);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-top: 16px;
+      padding: 20px;
+    }
+
+    /* --- FOOTER --- */
+    footer {
+      background: var(--color-pink);
+      padding: 50px 0 35px;
+      border-top: 2px solid var(--color-black);
+    }
+
+    .footer-content {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      border-bottom: 2px solid var(--color-black);
+      padding-bottom: 26px;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+    }
+
+    .footer-copy {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    @media (max-width: 768px) {
+      .site-wrapper {
+        padding: 0 20px;
+      }
+      .hero {
+        padding: 48px 20px 56px; /* 48px arriba, 20px a los lados, 56px abajo */
+      }
+
+      /* 2. Separación de las etiquetas respecto al header */
+      .location-tags {
+        margin-top: 8px;
+        margin-bottom: 20px;
+      }
+
+      /* 3. Evita que el título se aplaste o se monte con lo de arriba y abajo */
+      .hero-title { 
+        font-size: 2.2rem;     /* Un punto más contenido para móvil */
+        line-height: 1.15;     /* Interlineado más holgado para que respiren las letras */
+        margin-bottom: 20px;
+      }
+
+      /* 4. Margen del subtítulo para que no se pegue al botón */
+      .hero-sub {
+        font-size: 1rem;
+        margin-bottom: 28px;
+      }
+
+      .brand-logo { 
+        height: 210px; *header box size*
+      }
+
+      .nav-logo-img { 
+        height: 240px; 
+        transform: translateY(-10%) scale(3);
+      }
+
+      .nav-cta { 
+        top: 14px; 
+        right: 14px; 
+        padding: 9px 16px; 
+        font-size: 0.8rem; 
+      }
+
+      .funnel-container { 
+        padding: 24px; 
+      }
+
+      .footer-copy { 
+        flex-direction: column; 
+        gap: 8px; 
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <a href="#" class="brand-logo">
+      <img src="img/gocheeky-logo-jglo_background-green.svg" alt="Go Cheeky Studio" class="nav-logo-img" />
+    </a>
+  </header>
+
+  <!-- BOTÓN FLOTANTE INDEPENDIENTE -->
+  <a href="#apply" class="nav-cta">Apply for Project</a>
+
+  <!-- HERO SECTION -->
+  <section class="hero site-wrapper">
+    <div class="location-tags">
+      <span class="tag">London</span>
+      <span class="tag">Madrid</span>
+      <span class="tag">São Paulo</span>
+    </div>
+
+    <h1 class="hero-title">
+      We build <span class="highlight">cult-status</span> brands for creators.
+    </h1>
+
+    <p class="hero-sub">
+      A boutique visual identity and art direction studio turning high-impact channels into cohesive, commercially unstoppable creative empires.
+    </p>
+
+    <a href="#apply" class="btn-main">Book Your Discovery Call ↓</a>
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker">
+    <div class="ticker-inner">
+      <span>• bespoke typefaces</span>
+      <span>• youtube & podcast engines</span>
+      <span>• high-end merch & physical lines</span>
+      <span>• visual systems for creators</span>
+      <span>• uk · es · br</span>
+      <span>• bespoke typefaces</span>
+      <span>• youtube & podcast engines</span>
+      <span>• high-end merch & physical lines</span>
+      <span>• visual systems for creators</span>
+      <span>• uk · es · br</span>
+    </div>
+  </div>
+
+  <!-- PROCESS SECTION -->
+  <section class="process">
+    <div class="site-wrapper">
+      <h2 class="section-title">How We Partner</h2>
+      <div class="process-grid">
+        <div class="process-card">
+          <div class="process-num">01</div>
+          <h3>Discovery & Strategy</h3>
+          <p>A 20-minute qualification call to dissect your audience, channel bottlenecks and target brand ecosystem.</p>
+        </div>
+        <div class="process-card">
+          <div class="process-num">02</div>
+          <h3>Creative Direction Sprint</h3>
+          <p>We build your visual foundation: bespoke type systems, color palette, custom graphics and channel engines.</p>
+        </div>
+        <div class="process-card">
+          <div class="process-num">03</div>
+          <h3>Handover & System Hub</h3>
+          <p>Production-ready assets, modular video/thumbnail templates and guidelines ready for your editors and partners.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SHOWCASE -->
+  <section class="showcase site-wrapper">
+    <h2 class="section-title">Selected Drops</h2>
+    <div class="work-grid">
+      <div class="work-card">
+        <div class="work-box bg-pink">Drop 01</div>
+        <div class="work-details">
+          <div>
+            <h4>Midnight Audio</h4>
+            <span>youtube & spotify identity</span>
+          </div>
+          <span class="tag">uk</span>
+        </div>
+      </div>
+      <div class="work-card">
+        <div class="work-box bg-blue">Drop 02</div>
+        <div class="work-details">
+          <div>
+            <h4>Studio Carnaval</h4>
+            <span>merch line & creative direction</span>
+          </div>
+          <span class="tag">br</span>
+        </div>
+      </div>
+      <div class="work-card">
+        <div class="work-box bg-lime">Drop 03</div>
+        <div class="work-details">
+          <div>
+            <h4>Radar Urbano</h4>
+            <span>broadcast motion graphics</span>
+          </div>
+          <span class="tag">es</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUALIFICATION FORM + CALENDAR -->
+  <section class="funnel-section" id="apply">
+    <div class="site-wrapper" style="width: 100%; display: flex; justify-content: center;">
+      <div class="funnel-container">
+        
+        <div class="funnel-header">
+          <h2>Work with Go Cheeky</h2>
+          <p>We work with a limited roster of creators each quarter. Complete the 60-second qualification to unlock our scheduling calendar.</p>
+        </div>
+
+        <!-- FORMULARIO DE CUALIFICACIÓN -->
+        <form id="qualification-form" onsubmit="handleQualification(event)">
+          <div class="form-group">
+            <label for="name">Your Name / Alias</label>
+            <input type="text" id="name" class="form-control" placeholder="e.g. Alex" required />
+          </div>
+
+          <div class="form-group">
+            <label for="links">Primary Channels / Handles</label>
+            <input type="text" id="links" class="form-control" placeholder="youtube.com/@channel or @handle" required />
+          </div>
+
+          <div class="form-group">
+            <label for="project-type">Primary Focus</label>
+            <select id="project-type" class="form-control" required>
+              <option value="" disabled selected>Select project objective</option>
+              <option value="complete-rebrand">Full Channel Rebrand & Visual Identity</option>
+              <option value="merch-line">Merch Line & Physical Packaging</option>
+              <option value="show-launch">New Show / Podcast Launch System</option>
+              <option value="content-engine">Modular Thumbnail & Motion System</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="budget">Investment Range</label>
+            <select id="budget" class="form-control" required>
+              <option value="" disabled selected>Select budget bracket</option>
+              <option value="under-1.5k">Under €1.500</option>
+              <option value="1.5k-3k">€1.500 – €3.500</option>
+              <option value="3.5k-6k">€3.500 – €6.000</option>
+              <option value="6k-plus">€6.000+</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn-submit">Proceed to Calendar →</button>
+        </form>
+
+        <!-- CALENDARIO DINÁMICO TRAS CUALIFICAR -->
+        <div id="calendar-wrapper">
+          <h3 style="font-family: var(--font-display); font-size: 1.35rem; margin-bottom: 8px;">Pick a Time for Your Discovery Call</h3>
+          <p style="font-size: 0.9rem; color: #555; margin-bottom: 16px;">We'll discuss your brand goals and review creative references.</p>
+          
+          <div class="calendar-embed">
+            <p style="font-weight: 700; font-size: 1.05rem; margin-bottom: 8px;">[ Calendly / Cal.com Widget Embed ]</p>
+            <p style="font-size: 0.85rem; color: #666; max-width: 320px;">
+              Aquí se inserta el iframe de Calendly o Cal.com una vez configuréis vuestra cuenta.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="site-wrapper">
+      <div class="footer-content">
+        <div class="footer-logo">
+          <img src="img/gocheeky-logo-jglo_horizontal-black.png" alt="Go Cheeky Studio" class="footer-logo-img" />
+        </div>
+        <div>
+          <a href="mailto:gocheeky.co@gmail.com" style="color: var(--color-black); font-weight: 800; text-decoration: none; font-size: 1.05rem;">
+            gocheeky.co@gmail.com ↗
+          </a>
+        </div>
+      </div>
+      <div class="footer-copy">
+        <span>© Go Cheeky Studio. London · Madrid · São Paulo.</span>
+        <span>Visual Systems for Creator-Led Ventures.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SCRIPT PARA EL EMBUDO -->
+  <script>
+    function handleQualification(event) {
+      event.preventDefault();
+
+      const budget = document.getElementById('budget').value;
+      const form = document.getElementById('qualification-form');
+      const calendarWrapper = document.getElementById('calendar-wrapper');
+
+      if (budget === 'under-1.5k') {
+        alert('Thank you for reaching out! Our current custom identity sprints start at €1.500. We will email you our resource guide and template drop.');
+        return;
+      }
+
+      form.querySelector('.btn-submit').style.display = 'none';
+      calendarWrapper.style.display = 'block';
+      calendarWrapper.scrollIntoView({ behavior: 'smooth' });
+    }
+  </script>
+
+</body>
+</html>
