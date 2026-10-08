@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Go Cheeky — International Branding Studio for Creators</title>
+
+  <!-- Google Fonts: Poppins (Lectura) y Yuyu (Acentos / Identidad) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Yuyu:wght@400;700&family=Plus+Jakarta+Sans:wght@500;700&display=swap" rel="stylesheet">
+
+  <!-- Three.js Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <style>
+    /* =========================================================================
+       1. FUENTES TIPOGRÁFICAS
+       ========================================================================= */
+    @font-face {
+      font-family: 'Barnebok';
+      src: url('fonts/Barnebok.woff2') format('woff2'),
+           url('fonts/Barnebok.woff') format('woff'),
+           url('fonts/Barnebok.otf') format('opentype');
+      font-weight: 900;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    /* =========================================================================
+       2. VARIABLES DEL SISTEMA, PALETA Y TAMAÑOS
+       ========================================================================= */
+    :root {
+      --color-pink: #FF3388;        /* Fucsia neón insignia */
+      --color-black: #1A1F1D;       /* Negro carbón / Grafito */
+      --color-cream: #F8F7EE;       /* Vainilla suave / Fondo neutro */
+      --color-blue: #70BAFF;        /* Azul cielo acento */
+      --color-lime: #D6E842;        /* Lima eléctrico */
+      --color-card-bg: #FFFFFF;     /* Blanco para tarjetas */
+      
+      --font-display: 'Barnebok', sans-serif;
+      --font-accent: 'Yuyu', sans-serif;
+      --font-body: 'Poppins', sans-serif;
+
+      /* Altura de la banda negra ticker */
+      --ticker-height: 52px;
+
+      /* DIMENSIONES DE LA CAJA DEL HEADER EN ESCRITORIO */
+      --header-height: 94vh;
+      --header-min-height: 660px;
+      --header-max-height: none;
+
+      /* TAMAÑO DEL LOGO CALIBRADO CON TOPE EN 600px */
+      --logo-height: clamp(280px, 45vw, 600px);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--color-cream);
+      color: var(--color-black);
+      font-family: var(--font-body);
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    /* --- CONTENEDOR GLOBAL PARA VISIÓN EDITORIAL --- */
+    .site-wrapper {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+
+    /* =========================================================================
+       3. HEADER INTERACTIVO CON THREE.JS
+       ========================================================================= */
+    header.header-box {
+      width: 100%;
+      position: relative;
+      background: var(--color-cream);
+      border-bottom: 2px solid var(--color-black);
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: var(--header-height);
+      min-height: var(--header-min-height);
+      cursor: crosshair;
+    }
+
+    /* Canvas Three.js confinado con fondo crema preventivo (adiós pantalla negra) */
+    #webglCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 1;
+      background-color: var(--color-cream);
+      touch-action: pan-y;
+      pointer-events: auto;
+    }
+
+    /* Contenedor del Logo sobre el Canvas */
+    .brand-logo-container {
+      position: relative;
+      z-index: 5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none;
+      pointer-events: none; /* Clics atraviesan para generar ondas */
+      width: 100%;
+      height: 100%;
+      padding: 24px;
+    }
+
+    /* Logo */
+    .brand-logo-img {
+      height: var(--logo-height);
+      width: auto;
+      max-width: 86vw;
+      object-fit: contain;
+      display: block;
+      filter: drop-shadow(0px 8px 24px rgba(26, 31, 29, 0.16));
+      transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .brand-logo-container:hover .brand-logo-img {
+      transform: scale(1.02);
+    }
+
+    /* Badge interactivo con el color activo */
+    .palette-badge {
+      position: absolute;
+      top: 20px;
+      left: 24px;
+      z-index: 10;
+      pointer-events: auto;
+      background: rgba(248, 247, 238, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1.5px solid var(--color-black);
+      padding: 7px 15px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      box-shadow: 2.5px 2.5px 0px var(--color-black);
+      user-select: none;
+    }
+
+    .palette-indicator-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      transition: background-color 0.3s ease;
+      display: inline-block;
+      border: 1px solid rgba(0,0,0,0.15);
+    }
+
+    .palette-badge-text {
+      font-family: 'Plus Jakarta Sans', var(--font-body);
+      font-weight: 700;
+      color: var(--color-black);
+    }
+
+    /* Indicador discreto */
+    .header-hint {
+      position: absolute;
+      bottom: 14px;
+      right: 24px;
+      z-index: 10;
+      pointer-events: none;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: rgba(26, 31, 29, 0.55);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      background: rgba(248, 247, 238, 0.7);
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(26, 31, 29, 0.2);
+    }
+
+    /* --- BOTÓN FLOTANTE INDEPENDIENTE --- */
+    .nav-cta {
+      position: fixed;
+      top: 18px;
+      right: 24px;
+      z-index: 999;
+      background: var(--color-black);
+      color: var(--color-cream);
+      font-family: var(--font-body);
+      font-weight: 800;
+      font-size: 0.88rem;
+      padding: 11px 22px;
+      border-radius: 999px;
+      text-decoration: none;
+      border: 2px solid var(--color-black);
+      box-shadow: 3px 3px 0px var(--color-black);
+      transition: all 0.2s ease;
+    }
+
+    .nav-cta:hover {
+      background: var(--color-pink);
+      color: var(--color-black);
+      transform: translate(-2px, -2px);
+      box-shadow: 5px 5px 0px var(--color-black);
+    }
+
+    /* =========================================================================
+       4. TICKER / MARQUEE (BANDA NEGRA)
+       ========================================================================= */
+    .ticker {
+      background: var(--color-black);
+      color: var(--color-cream);
+      height: var(--ticker-height);
+      box-sizing: border-box;
+      overflow: hidden;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      border-bottom: 2px solid var(--color-black);
+    }
+
+    .ticker-inner {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+      animation: scroll 22s linear infinite;
+      font-family: var(--font-accent);
+      font-size: 1.6rem;
+      text-transform: lowercase;
+    }
+
+    @keyframes scroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* =========================================================================
+       5. HERO SECTION
+       ========================================================================= */
+    .hero {
+      padding: 64px 40px 72px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .location-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+
+    .tag {
+      font-family: var(--font-accent);
+      background: var(--color-lime);
+      color: var(--color-black);
+      font-size: 1.5rem;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px 22px 7px 22px;
+      border-radius: 999px;
+      border: 2px solid var(--color-black);
+      text-transform: capitalize;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.3rem, 4.8vw, 4.4rem);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      max-width: 17ch;
+      margin-bottom: 24px;
+    }
+
+    .hero-title .highlight {
+      color: var(--color-pink);
+      text-decoration: underline wavy var(--color-blue) 3px;
+      text-underline-offset: 6px;
+    }
+
+    .hero-sub {
+      font-size: 1.15rem;
+      max-width: 580px;
+      color: #333;
+      margin-bottom: 32px;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    .btn-main {
+      font-family: var(--font-body);
+      background: var(--color-pink);
+      color: var(--color-black);
+      font-size: 1rem;
+      font-weight: 800;
+      padding: 14px 30px;
+      border-radius: 999px;
+      border: 2px solid var(--color-black);
+      box-shadow: 4px 4px 0px var(--color-black);
+      text-decoration: none;
+      display: inline-block;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-main:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0px var(--color-black);
+      background: var(--color-lime);
+    }
+
+    /* =========================================================================
+       6. PROCESO EN 3 PASOS
+       ========================================================================= */
+    .process {
+      padding: 70px 0;
+      background: #FFFFFF;
+      border-top: 2px solid var(--color-black);
+      border-bottom: 2px solid var(--color-black);
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 2.1rem;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      margin-bottom: 36px;
+    }
+
+    .process-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 22px;
+    }
+
+    .process-card {
+      background: var(--color-cream);
+      border: 2px solid var(--color-black);
+      padding: 28px 22px;
+      border-radius: 14px;
+      box-shadow: 4px 4px 0px var(--color-black);
+    }
+
+    .process-num {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      color: var(--color-pink);
+      margin-bottom: 10px;
+    }
+
+    .process-card h3 {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      margin-bottom: 10px;
+    }
+
+    .process-card p {
+      font-size: 0.92rem;
+      color: #444;
+      line-height: 1.5;
+    }
+
+    /* =========================================================================
+       7. WORK SHOWCASE
+       ========================================================================= */
+    .showcase {
+      padding: 70px 0;
+    }
+
+    .work-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .work-card {
+      background: var(--color-card-bg);
+      border: 2px solid var(--color-black);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 4px 4px 0px var(--color-black);
+    }
+
+    .work-box {
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 2px solid var(--color-black);
+      font-family: var(--font-display);
+      font-size: 2rem;
+      letter-spacing: -0.02em;
+    }
+
+    .bg-pink { background: var(--color-pink); color: var(--color-black); }
+    .bg-blue { background: var(--color-blue); color: var(--color-black); }
+    .bg-lime { background: var(--color-lime); color: var(--color-black); }
+
+    .work-details {
+      padding: 18px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .work-details h4 {
+      font-family: var(--font-body);
+      font-weight: 800;
+      font-size: 1.3rem;
+    }
+
+    .work-details span {
+      font-family: var(--font-accent);
+      font-size: 1.3rem;
+      color: #666;
+      text-transform: lowercase;
+    }
+
+    /* =========================================================================
+       8. QUALIFICATION FORM + CALENDAR
+       ========================================================================= */
+    .funnel-section {
+      padding: 80px 0;
+      background: var(--color-cream);
+      border-top: 2px solid var(--color-black);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .funnel-container {
+      width: 100%;
+      max-width: 620px;
+      background: #FFFFFF;
+      border: 2px solid var(--color-black);
+      border-radius: 18px;
+      padding: 36px;
+      box-shadow: 6px 6px 0px var(--color-black);
+    }
+
+    .funnel-header {
+      margin-bottom: 26px;
+      text-align: center;
+    }
+
+    .funnel-header h2 {
+      font-family: var(--font-display);
+      font-size: 2.1rem;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .funnel-header p {
+      font-size: 0.95rem;
+      color: #555;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid var(--color-black);
+      border-radius: 10px;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      background: var(--color-cream);
+      outline: none;
+    }
+
+    .form-control:focus {
+      background: #FFF;
+      box-shadow: 0 0 0 3px var(--color-pink);
+    }
+
+    select.form-control {
+      cursor: pointer;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--color-black);
+      color: var(--color-cream);
+      font-family: var(--font-body);
+      font-size: 1.05rem;
+      font-weight: 800;
+      padding: 15px;
+      border-radius: 999px;
+      border: 2px solid var(--color-black);
+      box-shadow: 4px 4px 0px var(--color-black);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 10px;
+      display: inline-block;
+    }
+
+    .btn-submit:hover {
+      background: var(--color-pink);
+      color: var(--color-black);
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0px var(--color-black);
+    }
+
+    #calendar-wrapper {
+      display: none;
+      margin-top: 28px;
+      border-top: 2px dashed var(--color-black);
+      padding-top: 28px;
+      text-align: center;
+    }
+
+    .notice-box {
+      margin-top: 16px;
+      padding: 14px 18px;
+      border-radius: 10px;
+      border: 2px solid var(--color-black);
+      background: #FFF4A3;
+      font-weight: 600;
+      font-size: 0.92rem;
+      display: none;
+    }
+
+    /* =========================================================================
+       9. FOOTER
+       ========================================================================= */
+    footer {
+      background: var(--color-pink);
+      padding: 50px 0 35px;
+      border-top: 2px solid var(--color-black);
+    }
+
+    .footer-content {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      border-bottom: 2px solid var(--color-black);
+      padding-bottom: 26px;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+    }
+
+    .footer-logo-img {
+      height: 42px;
+      width: auto;
+      display: block;
+    }
+
+    .footer-copy {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    /* =========================================================================
+       10. RESPONSIVIDAD MÓVIL
+       ========================================================================= */
+    @media (max-width: 768px) {
+      header.header-box {
+        height: calc(100vh - var(--ticker-height));
+        height: calc(100dvh - var(--ticker-height));
+        min-height: auto;
+      }
+
+      :root {
+        --logo-height: clamp(260px, 48vh, 420px);
+      }
+
+      .site-wrapper {
+        padding: 0 20px;
+      }
+
+      .palette-badge {
+        top: 14px;
+        left: 14px;
+        font-size: 0.72rem;
+        padding: 5px 11px;
+      }
+
+      .header-hint {
+        bottom: 10px;
+        right: 12px;
+        font-size: 0.7rem;
+      }
+
+      .brand-logo-img {
+        max-width: 84vw;
+      }
+
+      .hero {
+        padding: 42px 20px 54px;
+      }
+
+      .location-tags {
+        margin-top: 6px;
+        margin-bottom: 18px;
+      }
+
+      .hero-title {
+        font-size: 2.15rem;
+        line-height: 1.15;
+        margin-bottom: 18px;
+      }
+
+      .hero-sub {
+        font-size: 1rem;
+        margin-bottom: 26px;
+      }
+
+      .nav-cta {
+        top: 14px;
+        right: 14px;
+        padding: 8px 14px;
+        font-size: 0.78rem;
+      }
+
+      .funnel-container {
+        padding: 24px;
+      }
+
+      .footer-copy {
+        flex-direction: column;
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =========================================================================
+       1. HEADER CON FONDO DE ONDAS THREE.JS + LOGO STACKED HOTPINK
+       ========================================================================= -->
+  <header class="header-box" id="headerContainer">
+    <!-- Lienzo WebGL Three.js -->
+    <canvas id="webglCanvas"></canvas>
+
+    <!-- Indicador de color activo -->
+    <div class="palette-badge" title="Active chromatic wave frequency">
+      <span class="palette-indicator-dot" id="nextColorDot" style="background-color: #ff488a;"></span>
+      <span class="palette-badge-text" id="paletteName">#ff488a</span>
+    </div>
+
+    <!-- Indicador de interacción -->
+    <span class="header-hint">Tap / Click to ripple</span>
+
+    <!-- Logo Stacked Hotpink -->
+    <a href="#" class="brand-logo-container" aria-label="Go Cheeky Studio Home">
+      <img 
+        src="img/gocheeky-logo-jglo_stacked-hotpink.png" 
+        alt="Go Cheeky Studio" 
+        class="brand-logo-img" 
+        onerror="this.onerror=null; this.src='https://placehold.co/480x280/FF3388/1A1F1D?text=GO+CHEEKY';"
+      />
+    </a>
+  </header>
+
+  <!-- =========================================================================
+       2. TICKER / MARQUEE (BANDA NEGRA)
+       ========================================================================= -->
+  <div class="ticker">
+    <div class="ticker-inner">
+      <span>• bespoke typefaces</span>
+      <span>• youtube & podcast engines</span>
+      <span>• high-end merch & physical lines</span>
+      <span>• visual systems for creators</span>
+      <span>• uk · es · br</span>
+      <span>• bespoke typefaces</span>
+      <span>• youtube & podcast engines</span>
+      <span>• high-end merch & physical lines</span>
+      <span>• visual systems for creators</span>
+      <span>• uk · es · br</span>
+    </div>
+  </div>
+
+  <!-- BOTÓN FLOTANTE INDEPENDIENTE -->
+  <a href="#apply" class="nav-cta">Apply for Project</a>
+
+  <!-- =========================================================================
+       3. HERO SECTION
+       ========================================================================= -->
+  <section class="hero site-wrapper">
+    <div class="location-tags">
+      <span class="tag">London</span>
+      <span class="tag">Madrid</span>
+      <span class="tag">São Paulo</span>
+    </div>
+
+    <h1 class="hero-title">
+      We build <span class="highlight">cult-status</span> brands for creators.
+    </h1>
+
+    <p class="hero-sub">
+      A boutique visual identity and art direction studio turning high-impact channels into cohesive, commercially unstoppable creative empires.
+    </p>
+
+    <a href="#apply" class="btn-main">Book Your Discovery Call ↓</a>
+  </section>
+
+  <!-- =========================================================================
+       4. PROCESS SECTION
+       ========================================================================= -->
+  <section class="process">
+    <div class="site-wrapper">
+      <h2 class="section-title">How We Partner</h2>
+      <div class="process-grid">
+        <div class="process-card">
+          <div class="process-num">01</div>
+          <h3>Discovery & Strategy</h3>
+          <p>A 20-minute qualification call to dissect your audience, channel bottlenecks and target brand ecosystem.</p>
+        </div>
+        <div class="process-card">
+          <div class="process-num">02</div>
+          <h3>Creative Direction Sprint</h3>
+          <p>We build your visual foundation: bespoke type systems, color palette, custom graphics and channel engines.</p>
+        </div>
+        <div class="process-card">
+          <div class="process-num">03</div>
+          <h3>Handover & System Hub</h3>
+          <p>Production-ready assets, modular video/thumbnail templates and guidelines ready for your editors and partners.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       5. WORK SHOWCASE
+       ========================================================================= -->
+  <section class="showcase site-wrapper">
+    <h2 class="section-title">Selected Drops</h2>
+    <div class="work-grid">
+      <div class="work-card">
+        <div class="work-box bg-pink">Drop 01</div>
+        <div class="work-details">
+          <div>
+            <h4>Midnight Audio</h4>
+            <span>youtube & spotify identity</span>
+          </div>
+          <span class="tag">uk</span>
+        </div>
+      </div>
+      <div class="work-card">
+        <div class="work-box bg-blue">Drop 02</div>
+        <div class="work-details">
+          <div>
+            <h4>Studio Carnaval</h4>
+            <span>merch line & creative direction</span>
+          </div>
+          <span class="tag">br</span>
+        </div>
+      </div>
+      <div class="work-card">
+        <div class="work-box bg-lime">Drop 03</div>
+        <div class="work-details">
+          <div>
+            <h4>Radar Urbano</h4>
+            <span>broadcast motion graphics</span>
+          </div>
+          <span class="tag">es</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       6. QUALIFICATION FORM + CALENDAR
+       ========================================================================= -->
+  <section class="funnel-section" id="apply">
+    <div class="site-wrapper" style="width: 100%; display: flex; justify-content: center;">
+      <div class="funnel-container">
+        
+        <div class="funnel-header">
+          <h2>Work with Go Cheeky</h2>
+          <p>We work with a limited roster of creators each quarter. Complete the 60-second qualification to unlock our scheduling calendar.</p>
+        </div>
+
+        <!-- FORMULARIO DE CUALIFICACIÓN -->
+        <form id="qualification-form" onsubmit="handleQualification(event)">
+          <div class="form-group">
+            <label for="name">Your Name / Alias</label>
+            <input type="text" id="name" class="form-control" placeholder="e.g. Alex" required />
+          </div>
+
+          <div class="form-group">
+            <label for="links">Primary Channels / Handles</label>
+            <input type="text" id="links" class="form-control" placeholder="youtube.com/@channel or @handle" required />
+          </div>
+
+          <div class="form-group">
+            <label for="project-type">Primary Focus</label>
+            <select id="project-type" class="form-control" required>
+              <option value="" disabled selected>Select project objective</option>
+              <option value="complete-rebrand">Full Channel Rebrand & Visual Identity</option>
+              <option value="merch-line">Merch Line & Physical Packaging</option>
+              <option value="show-launch">New Show / Podcast Launch System</option>
+              <option value="content-engine">Modular Thumbnail & Motion System</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="budget">Investment Range</label>
+            <select id="budget" class="form-control" required>
+              <option value="" disabled selected>Select budget bracket</option>
+              <option value="under-1.5k">Under €1.500</option>
+              <option value="1.5k-3k">€1.500 – €3.500</option>
+              <option value="3.5k-6k">€3.500 – €6.000</option>
+              <option value="6k-plus">€6.000+</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn-submit">Proceed to Calendar →</button>
+        </form>
+
+        <!-- Mensaje de aviso para presupuestos menores a €1500 -->
+        <div id="notice-box" class="notice-box"></div>
+
+        <!-- CALENDARIO DINÁMICO TRAS CUALIFICAR -->
+        <div id="calendar-wrapper">
+          <h3 style="font-family: var(--font-display); font-size: 1.35rem; margin-bottom: 8px;">Pick a Time for Your Discovery Call</h3>
+          <p style="font-size: 0.9rem; color: #555; margin-bottom: 16px;">We'll discuss your brand goals and review creative references.</p>
+          
+          <!-- Calendly inline widget begin -->
+          <div class="calendly-inline-widget" data-url="https://calendly.com/gocheeky-co/30min?hide_landing_page_details=1&text_color=262b27&primary_color=ff488a" style="min-width:300px;height:680px;"></div>
+          <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
+          <!-- Calendly inline widget end -->
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       7. FOOTER
+       ========================================================================= -->
+  <footer>
+    <div class="site-wrapper">
+      <div class="footer-content">
+        <div class="footer-logo">
+          <img 
+            src="img/gocheeky-logo-jglo_horizontal-black.png" 
+            alt="Go Cheeky Studio" 
+            class="footer-logo-img" 
+            onerror="this.onerror=null; this.src='https://placehold.co/240x44/1A1F1D/F8F7EE?text=GO+CHEEKY';"
+          />
+        </div>
+        <div>
+          <a href="mailto:gocheeky.co@gmail.com" style="color: var(--color-black); font-weight: 800; text-decoration: none; font-size: 1.05rem;">
+            gocheeky.co@gmail.com ↗
+          </a>
+        </div>
+      </div>
+      <div class="footer-copy">
+        <span>© Go Cheeky Studio. London · Madrid · São Paulo.</span>
+        <span>Visual Systems for Creator-Led Ventures.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- =========================================================================
+       8. THREE.JS SIMULATION OPTIMIZADO (INICIO INMEDIATO SIN FLASH NEGRO)
+       ========================================================================= -->
+  <script>
+    (function initRippleCanvas() {
+      const headerContainer = document.getElementById('headerContainer');
+      const canvas = document.getElementById('webglCanvas');
+      const nextColorDot = document.getElementById('nextColorDot');
+      const paletteName = document.getElementById('paletteName');
+
+      const PALETA_CONFIG = [
+        { nombre: 'Rosa Neón', hex: '#ff488a', rgb: [1.0, 0.282, 0.541] },
+        { nombre: 'Lima Eléctrica', hex: '#dae250', rgb: [0.855, 0.886, 0.314] },
+        { nombre: 'Baya Profunda', hex: '#af0b59', rgb: [0.686, 0.043, 0.349] },
+        { nombre: 'Celeste Pastel', hex: '#70baff', rgb: [0.439, 0.729, 1.0] },
+        { nombre: 'Croma Bicolor', hex: '#ff488a', rgb: [1.0, 0.282, 0.541] }
+      ];
+
+      let indiceColorSiguiente = 0;
+      const VELOCIDAD_FIJA = 1.4;
+      const LONGITUD_SUAVE = 3.2;
+      const MAX_ONDAS = 16;
+      const DURACION_ONDA = 7.5;
+
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xF8F7EE);
+
+      // Calculamos dimensiones inmediatamente desde el DOM sin esperar a load
+      const initRect = headerContainer.getBoundingClientRect();
+      const initialWidth = initRect.width || window.innerWidth;
+      const initialHeight = initRect.height || (window.innerHeight * 0.94);
+
+      const camera = new THREE.PerspectiveCamera(34, initialWidth / initialHeight, 0.1, 1000);
+      camera.position.set(0, 30, 5.0);
+      camera.lookAt(0, 0, 0);
+
+      const renderer = new THREE.WebGLRenderer({
+        canvas: canvas,
+        antialias: true,
+        powerPreference: 'high-performance',
+        alpha: false
+      });
+      renderer.setSize(initialWidth, initialHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      const waveOrigins = new Float32Array(MAX_ONDAS * 2);
+      const waveTimes = new Float32Array(MAX_ONDAS);
+      const waveColors = new Float32Array(MAX_ONDAS * 3);
+      const waveAlphas = new Float32Array(MAX_ONDAS);
+
+      let listaOndas = [];
+
+      // Malla optimizada a 120x120 segmentos: fluida, ligera y sin lag inicial
+      const planeSize = 120;
+      const geometry = new THREE.PlaneGeometry(planeSize, planeSize, 120, 120);
+      geometry.rotateX(-Math.PI / 2);
+
+      const waterCustomMaterial = new THREE.ShaderMaterial({
+        uniforms: {
+          uTime: { value: 0.0 },
+          uBaseColor: { value: new THREE.Color(0xF8F7EE) },
+          uWaveSpeed: { value: VELOCIDAD_FIJA },
+          uWaveWavelength: { value: LONGITUD_SUAVE },
+          uWaveOrigins: { value: waveOrigins },
+          uWaveTimes: { value: waveTimes },
+          uWaveColors: { value: waveColors },
+          uWaveAlphas: { value: waveAlphas }
+        },
+        vertexShader: `
+          uniform float uWaveSpeed;
+          uniform float uWaveWavelength;
+          uniform vec2 uWaveOrigins[${MAX_ONDAS}];
+          uniform float uWaveTimes[${MAX_ONDAS}];
+          uniform float uWaveAlphas[${MAX_ONDAS}];
+
+          varying vec3 vWorldPosition;
+          varying vec3 vNormal;
+          varying float vTotalElevation;
+          varying vec2 vUv;
+
+          void main() {
+            vUv = uv;
+            vec3 pos = position;
+            float totalY = 0.0;
+            vec3 approxNormal = vec3(0.0, 1.0, 0.0);
+
+            for (int i = 0; i < ${MAX_ONDAS}; i++) {
+              if (uWaveAlphas[i] <= 0.001) continue;
+
+              float t = uWaveTimes[i];
+              vec2 origin = uWaveOrigins[i];
+              float dist = distance(pos.xz, origin);
+
+              float radioActual = t * uWaveSpeed * 3.6;
+              float anchoOnda = uWaveWavelength;
+              float delta = dist - radioActual;
+
+              float campana = exp(-(delta * delta) / (anchoOnda * anchoOnda));
+              float amortiguacion = uWaveAlphas[i] * exp(-dist * 0.075);
+              float elevacion = sin(delta * (3.14159 / anchoOnda)) * campana * amortiguacion * 0.35;
+              totalY += elevacion;
+
+              if (abs(delta) < anchoOnda * 1.5 && dist > 0.05) {
+                vec2 dir = normalize(pos.xz - origin);
+                float dElev = elevacion * 0.45;
+                approxNormal.x -= dir.x * dElev;
+                approxNormal.z -= dir.y * dElev;
+              }
+            }
+
+            float distCentroGeom = length(pos.xz);
+            float desvanecimientoBorde = 1.0 - smoothstep(44.0, 58.0, distCentroGeom);
+            totalY *= desvanecimientoBorde;
+
+            pos.y += totalY;
+            vTotalElevation = totalY;
+            vNormal = normalize(approxNormal);
+
+            vec4 worldPos = modelMatrix * vec4(pos, 1.0);
+            vWorldPosition = worldPos.xyz;
+            gl_Position = projectionMatrix * viewMatrix * worldPos;
+          }
+        `,
+        fragmentShader: `
+          uniform vec3 uBaseColor;
+          uniform vec2 uWaveOrigins[${MAX_ONDAS}];
+          uniform float uWaveTimes[${MAX_ONDAS}];
+          uniform vec3 uWaveColors[${MAX_ONDAS}];
+          uniform float uWaveAlphas[${MAX_ONDAS}];
+          uniform float uWaveSpeed;
+          uniform float uWaveWavelength;
+
+          varying vec3 vWorldPosition;
+          varying vec3 vNormal;
+          varying float vTotalElevation;
+          varying vec2 vUv;
+
+          void main() {
+            vec3 finalColor = uBaseColor;
+            vec3 waveColorAccum = vec3(0.0);
+            float totalColorAlpha = 0.0;
+
+            for (int i = 0; i < ${MAX_ONDAS}; i++) {
+              if (uWaveAlphas[i] <= 0.001) continue;
+
+              float t = uWaveTimes[i];
+              vec2 origin = uWaveOrigins[i];
+              float dist = distance(vWorldPosition.xz, origin);
+
+              float radioActual = t * uWaveSpeed * 3.6;
+              float delta = abs(dist - radioActual);
+
+              float anchoFrente = uWaveWavelength * 1.15;
+              float factorPresencia = 1.0 - smoothstep(0.0, anchoFrente, delta);
+              float atenuacion = uWaveAlphas[i] * exp(-dist * 0.07);
+              float pesoOnda = factorPresencia * atenuacion;
+
+              if (pesoOnda > 0.001) {
+                vec3 waveBase = uWaveColors[i];
+                float brilloCresta = smoothstep(0.05, 0.45, vTotalElevation);
+                vec3 colorPico = mix(waveBase, vec3(0.855, 0.886, 0.314), brilloCresta * 0.45);
+
+                waveColorAccum += colorPico * pesoOnda;
+                totalColorAlpha += pesoOnda;
+              }
+            }
+
+            if (totalColorAlpha > 0.001) {
+              float blendWeight = clamp(totalColorAlpha * 1.45, 0.0, 0.94);
+              vec3 avgWaveColor = waveColorAccum / max(totalColorAlpha, 0.001);
+              finalColor = mix(finalColor, avgWaveColor, blendWeight);
+            }
+
+            float distCentroMundo = length(vWorldPosition.xz);
+            float factorInfinito = smoothstep(42.0, 58.0, distCentroMundo);
+            finalColor = mix(finalColor, uBaseColor, factorInfinito);
+
+            vec3 lightDir = normalize(vec3(0.0, 1.0, 0.15));
+            vec3 norm = normalize(vNormal);
+            float diff = max(dot(norm, lightDir), 0.0);
+
+            vec3 viewDir = normalize(cameraPosition - vWorldPosition);
+            vec3 halfVector = normalize(lightDir + viewDir);
+            float spec = pow(max(dot(norm, halfVector), 0.0), 32.0);
+
+            float ao = clamp(1.0 + vTotalElevation * 0.12, 0.96, 1.04);
+            vec3 shadedColor = finalColor * (0.92 + 0.08 * diff) * ao + vec3(0.98, 0.97, 0.92) * spec * 0.22;
+            gl_FragColor = vec4(shadedColor, 1.0);
+          }
+        `,
+        side: THREE.DoubleSide
+      });
+
+      const waterMesh = new THREE.Mesh(geometry, waterCustomMaterial);
+      scene.add(waterMesh);
+
+      class OndaCromatica {
+        constructor(x, z, configPaleta, tiempoInicial = 0.0) {
+          this.x = x;
+          this.z = z;
+          this.tiempo = tiempoInicial;
+          this.duracion = DURACION_ONDA;
+          this.colorRgb = configPaleta.rgb;
+          this.viva = true;
+          this.alfa = 1.0;
+        }
+
+        actualizar(dt) {
+          this.tiempo += dt;
+          const progreso = this.tiempo / this.duracion;
+          if (progreso >= 1.0) {
+            this.viva = false;
+            this.alfa = 0.0;
+            return;
+          }
+          this.alfa = Math.pow(1.0 - progreso, 1.85);
+        }
+      }
+
+      const raycaster = new THREE.Raycaster();
+      const mousePos = new THREE.Vector2();
+      const infinitePlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+
+      function engendrarOnda(clientX, clientY, tiempoOffset = 0.0) {
+        const rect = headerContainer.getBoundingClientRect();
+        if (
+          clientX < rect.left ||
+          clientX > rect.right ||
+          clientY < rect.top ||
+          clientY > rect.bottom
+        ) return;
+
+        mousePos.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+        mousePos.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+
+        raycaster.setFromCamera(mousePos, camera);
+        const impactPoint = new THREE.Vector3();
+        const interseca = raycaster.ray.intersectPlane(infinitePlane, impactPoint);
+        if (!interseca) return;
+
+        const configActual = PALETA_CONFIG[indiceColorSiguiente];
+        indiceColorSiguiente = (indiceColorSiguiente + 1) % PALETA_CONFIG.length;
+        actualizarIndicadorPaleta();
+
+        if (listaOndas.length >= MAX_ONDAS) {
+          listaOndas.shift();
+        }
+
+        const nuevaOnda = new OndaCromatica(impactPoint.x, impactPoint.z, configActual, tiempoOffset);
+        listaOndas.push(nuevaOnda);
+      }
+
+      function actualizarIndicadorPaleta() {
+        const siguiente = PALETA_CONFIG[indiceColorSiguiente];
+        nextColorDot.style.backgroundColor = siguiente.hex;
+        paletteName.textContent = siguiente.hex;
+      }
+
+      headerContainer.addEventListener('pointerdown', (e) => {
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        engendrarOnda(e.clientX, e.clientY);
+      }, { passive: true });
+
+      function ajustarDimensionesHeader() {
+        const rect = headerContainer.getBoundingClientRect();
+        const width = rect.width || window.innerWidth;
+        const height = rect.height || (window.innerHeight * 0.94);
+        
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      }
+
+      window.addEventListener('resize', ajustarDimensionesHeader);
+      window.addEventListener('orientationchange', ajustarDimensionesHeader);
+
+      const clock = new THREE.Clock();
+
+      function animarOndas() {
+        requestAnimationFrame(animarOndas);
+
+        const delta = Math.min(clock.getDelta(), 0.1);
+        const elapsedTime = clock.getElapsedTime();
+
+        waterCustomMaterial.uniforms.uTime.value = elapsedTime;
+
+        for (let i = listaOndas.length - 1; i >= 0; i--) {
+          const onda = listaOndas[i];
+          onda.actualizar(delta);
+          if (!onda.viva) {
+            listaOndas.splice(i, 1);
+          }
+        }
+
+        for (let i = 0; i < MAX_ONDAS; i++) {
+          if (i < listaOndas.length) {
+            const o = listaOndas[i];
+            waveOrigins[i * 2 + 0] = o.x;
+            waveOrigins[i * 2 + 1] = o.z;
+            waveTimes[i] = o.tiempo;
+            waveColors[i * 3 + 0] = o.colorRgb[0];
+            waveColors[i * 3 + 1] = o.colorRgb[1];
+            waveColors[i * 3 + 2] = o.colorRgb[2];
+            waveAlphas[i] = o.alfa;
+          } else {
+            waveAlphas[i] = 0.0;
+            waveTimes[i] = 0.0;
+          }
+        }
+
+        waterCustomMaterial.uniforms.uWaveOrigins.value = waveOrigins;
+        waterCustomMaterial.uniforms.uWaveTimes.value = waveTimes;
+        waterCustomMaterial.uniforms.uWaveColors.value = waveColors;
+        waterCustomMaterial.uniforms.uWaveAlphas.value = waveAlphas;
+
+        renderer.render(scene, camera);
+      }
+
+      // 1. Iniciamos paleta y generamos la primera onda inmediatamente activa (con tiempoOffset para que ya esté propagada al cargar)
+      actualizarIndicadorPaleta();
+      const curRect = headerContainer.getBoundingClientRect();
+      engendrarOnda(curRect.left + curRect.width * 0.48, curRect.top + curRect.height * 0.52, 0.4);
+
+      // 2. Renderizado forzado del primer frame síncrono (evita el parpadeo negro en el arranque)
+      renderer.render(scene, camera);
+
+      // 3. Inicio del loop continuo de animación
+      animarOndas();
+
+      // Segunda onda decorativa sutil medio segundo después
+      setTimeout(() => {
+        const r = headerContainer.getBoundingClientRect();
+        engendrarOnda(r.left + r.width * 0.54, r.top + r.height * 0.46);
+      }, 500);
+    })();
+
+    /* --- GESTIÓN DEL FORMULARIO DE CUALIFICACIÓN --- */
+    function handleQualification(event) {
+      event.preventDefault();
+
+      const budget = document.getElementById('budget').value;
+      const form = document.getElementById('qualification-form');
+      const calendarWrapper = document.getElementById('calendar-wrapper');
+      const noticeBox = document.getElementById('notice-box');
+
+      noticeBox.style.display = 'none';
+
+      if (budget === 'under-1.5k') {
+        noticeBox.textContent = 'Thank you for reaching out! Our current custom identity sprints start at €1.500. We will email you our resource guide and template drops.';
+        noticeBox.style.display = 'block';
+        return;
+      }
+
+      form.querySelector('.btn-submit').style.display = 'none';
+      calendarWrapper.style.display = 'block';
+      calendarWrapper.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    /* --- BLOQUEO DE MENÚ CONTEXTUAL EN IMÁGENES --- */
+    document.addEventListener('contextmenu', (event) => {
+      if (event.target.tagName === 'IMG') {
+        event.preventDefault();
+      }
+    });
+  </script>
+</body>
+</html>
