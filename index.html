@@ -899,6 +899,9 @@
   <!-- =========================================================================
        8. THREE.JS SIMULATION OPTIMIZADO (INICIO INMEDIATO SIN FLASH NEGRO)
        ========================================================================= -->
+<!-- =========================================================================
+       8. THREE.JS SIMULATION (ONDAS INICIALES CENTRADAS EN EJE X)
+       ========================================================================= -->
   <script>
     (function initRippleCanvas() {
       const headerContainer = document.getElementById('headerContainer');
@@ -906,9 +909,10 @@
       const nextColorDot = document.getElementById('nextColorDot');
       const paletteName = document.getElementById('paletteName');
 
+      // Paleta cromática coordinada
       const PALETA_CONFIG = [
+        { nombre: 'Lima Eléctrica', hex: '#dae250', rgb: [0.855, 0.886, 0.314] }, // Verde lima como primer pulso
         { nombre: 'Rosa Neón', hex: '#ff488a', rgb: [1.0, 0.282, 0.541] },
-        { nombre: 'Lima Eléctrica', hex: '#dae250', rgb: [0.855, 0.886, 0.314] },
         { nombre: 'Baya Profunda', hex: '#af0b59', rgb: [0.686, 0.043, 0.349] },
         { nombre: 'Celeste Pastel', hex: '#70baff', rgb: [0.439, 0.729, 1.0] },
         { nombre: 'Croma Bicolor', hex: '#ff488a', rgb: [1.0, 0.282, 0.541] }
@@ -923,7 +927,6 @@
       const scene = new THREE.Scene();
       scene.background = new THREE.Color(0xF8F7EE);
 
-      // Calculamos dimensiones inmediatamente desde el DOM sin esperar a load
       const initRect = headerContainer.getBoundingClientRect();
       const initialWidth = initRect.width || window.innerWidth;
       const initialHeight = initRect.height || (window.innerHeight * 0.94);
@@ -948,7 +951,6 @@
 
       let listaOndas = [];
 
-      // Malla optimizada a 120x120 segmentos: fluida, ligera y sin lag inicial
       const planeSize = 120;
       const geometry = new THREE.PlaneGeometry(planeSize, planeSize, 120, 120);
       geometry.rotateX(-Math.PI / 2);
@@ -1216,52 +1218,26 @@
         renderer.render(scene, camera);
       }
 
-      // 1. Iniciamos paleta y generamos la primera onda inmediatamente activa (con tiempoOffset para que ya esté propagada al cargar)
+      // =======================================================================
+      // 👉 ONDA INICIAL CLAVADA EXACTAMENTE AL CENTRO EN EL EJE X (width * 0.5):
+      // =======================================================================
       actualizarIndicadorPaleta();
       const curRect = headerContainer.getBoundingClientRect();
-      engendrarOnda(curRect.left + curRect.width * 0.48, curRect.top + curRect.height * 0.52, 0.4);
+      const centroX = curRect.left + curRect.width * 0.5;   // 🎯 Centro exacto en X
+      const centroY = curRect.top + curRect.height * 0.5;  // 🎯 Centro exacto en Y (detrás del logo)
 
-      // 2. Renderizado forzado del primer frame síncrono (evita el parpadeo negro en el arranque)
+      engendrarOnda(centroX, centroY, 0.4);
+
+      // Render forzado inicial y arranque
       renderer.render(scene, camera);
-
-      // 3. Inicio del loop continuo de animación
       animarOndas();
 
-      // Segunda onda decorativa sutil medio segundo después
+      // Segundo pulso suave concéntrico en el centro tras 400ms
       setTimeout(() => {
         const r = headerContainer.getBoundingClientRect();
-        engendrarOnda(r.left + r.width * 0.54, r.top + r.height * 0.46);
-      }, 500);
+        engendrarOnda(r.left + r.width * 0.5, r.top + r.height * 0.5);
+      }, 400);
     })();
-
-    /* --- GESTIÓN DEL FORMULARIO DE CUALIFICACIÓN --- */
-    function handleQualification(event) {
-      event.preventDefault();
-
-      const budget = document.getElementById('budget').value;
-      const form = document.getElementById('qualification-form');
-      const calendarWrapper = document.getElementById('calendar-wrapper');
-      const noticeBox = document.getElementById('notice-box');
-
-      noticeBox.style.display = 'none';
-
-      if (budget === 'under-1.5k') {
-        noticeBox.textContent = 'Thank you for reaching out! Our current custom identity sprints start at €1.500. We will email you our resource guide and template drops.';
-        noticeBox.style.display = 'block';
-        return;
-      }
-
-      form.querySelector('.btn-submit').style.display = 'none';
-      calendarWrapper.style.display = 'block';
-      calendarWrapper.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    /* --- BLOQUEO DE MENÚ CONTEXTUAL EN IMÁGENES --- */
-    document.addEventListener('contextmenu', (event) => {
-      if (event.target.tagName === 'IMG') {
-        event.preventDefault();
-      }
-    });
   </script>
 </body>
 </html>
